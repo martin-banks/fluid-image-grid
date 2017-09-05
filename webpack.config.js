@@ -50,12 +50,6 @@ const embedCode = () => `<div>
 	${localstyle}
 	<link rel="stylesheet" href="${embedPath}/${cssName}" />
 	<div id="${projectName}" class=""></div>
-	<script>
-		/* embed code config options */
-		var sectionsToRender = ${JSON.stringify(config.sections.ready, null, 2)};
-		var showHeaderSection = 'false';
-		var environment = '${ENV === 'PROD' ? 'PROD' : 'DEV'}'; /* DEV / PROD */
-		</script>
 	<script type="text/javascript" src="${embedPath}/${jsName}" ></script>
 </div>`
 
