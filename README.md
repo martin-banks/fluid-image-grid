@@ -40,8 +40,8 @@ Add you files into the ```src/content/images/_RAW``` directory, then run ```npm 
 
 To add them to your app, open the ```src/content/index.js``` file. Import the images at the top of the file and include that reference in the object for that entry, so say you have an ```myAwesomeImage.jpg```, you js would look like this:
 
-  import * as myAwesomeImage from './images/myAwesomeImage'
-  const content = {
+    import * as myAwesomeImage from './images/myAwesomeImage'
+    const content = {
     title: '',
     intro: '',
     parts: [
@@ -50,8 +50,8 @@ To add them to your app, open the ```src/content/index.js``` file. Import the im
         "caption": "Caption text including credit if required",
       },
     ]
-  }
-  export default content
+    }
+    export default content
 
 Add more import more images and add more objects to the ```content.parts``` array. 
 
