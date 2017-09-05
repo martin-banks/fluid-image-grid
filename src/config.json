@@ -1,0 +1,33 @@
+{
+  "projectName": "fluid_image_grid",
+  "version": "1.0.0",
+  "section": "network",
+  "path": {
+    "DEV": "localhost:8080/",
+    "UAT": ".",
+    "PROD": ""
+  },
+  "localstyle": false,
+  "allowClickToFullScreen": true,
+  "autoscroll": {
+    "active": false,
+    "speed": 30
+  },
+  "images": {
+    "children": false,
+    "jsPrefix": "Img",
+    "sizes": {
+      "thumb": 50,
+      "min": 200,
+      "max": 1000,
+      "inc": 200
+    },
+    "quality": {
+      "image": 40,
+      "thumb": 80
+    },
+    "thumbBlurLarge": 2,
+    "thumbBlurSmall": 1,
+    "location": "./src/content/images"
+  }
+}
