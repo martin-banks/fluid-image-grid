@@ -42,23 +42,32 @@ To add them to your app, open the ```src/content/index.js``` file. Import the im
 
     import * as myAwesomeImage from './images/myAwesomeImage'
     const content = {
-    title: '',
-    intro: '',
-    parts: [
-      {
-        "image": myAwesomeImage,
-        "caption": "Caption text including credit if required",
-      },
-    ]
+      parts: [
+        {
+          "image": myAwesomeImage,
+          "caption": "Caption text including credit if required",
+        },
+      ]
     }
     export default content
 
 Add more import more images and add more objects to the ```content.parts``` array. 
 
-### What's going on here?
+#### What's going on here?
 The node app that processes the images creates multiple versions of the same image, it saves each into a directory named for that size (width). It then writes a reference to that image into a js file including some basic information about the file (original dimensions and orientation)
 
 We can then use JS imports to reference this file in our content object. The supplied Webpack.config.js file is set up to process imported images; creating a new instance of that file along with absolute paths that are passed into the img template.
 
 --- 
 
+## Build outputs
+There are two options for outputing build version for deployment: UAT and PROD. These builds are intended for deployment to be hosted over a server, all file paths including scripts, styles and images are processed based on this location.  
+
+### What files are output?
+- ```index.html```: entry point to view the app
+- ```embedCode.html```: html embed code that can be included in other sites
+- ```app.js```: the full js SPA
+- ```app.css```:  all teh styles
+- ```report.json```: Info about the date/time/user/config setting of the buils
+- ```build.xml```: Only for PROD, this file is used in my deployment server
+- ```src/...```: Directory containing images, icons etc
