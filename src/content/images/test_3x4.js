@@ -1,0 +1,10 @@
+export { default as Imgthumb } from './processed/thumb/test_3x4.jpg';
+export { default as ImgthumbBlurSmall } from './processed/thumbBlurSmall/test_3x4.jpg';
+export { default as ImgthumbBlurLarge } from './processed/thumbBlurLarge/test_3x4.jpg';
+export const ImgData = { width: 366, height: 488, ratio: 1.3333333333333333, orientation: 'portrait' };
+export { default as Img200 } from './processed/200/test_3x4.jpg';
+export { default as Img400 } from './processed/400/test_3x4.jpg';
+export { default as Img600 } from './processed/600/test_3x4.jpg';
+export { default as Img800 } from './processed/800/test_3x4.jpg';
+export { default as Img1000 } from './processed/1000/test_3x4.jpg';
+export { default as Img1200 } from './processed/1200/test_3x4.jpg';

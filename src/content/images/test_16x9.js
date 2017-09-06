@@ -1,0 +1,10 @@
+export { default as Imgthumb } from './processed/thumb/test_16x9.jpg';
+export { default as ImgthumbBlurSmall } from './processed/thumbBlurSmall/test_16x9.jpg';
+export { default as ImgthumbBlurLarge } from './processed/thumbBlurLarge/test_16x9.jpg';
+export const ImgData = { width: 650, height: 366, ratio: 0.563076923076923, orientation: 'landscape' };
+export { default as Img200 } from './processed/200/test_16x9.jpg';
+export { default as Img400 } from './processed/400/test_16x9.jpg';
+export { default as Img600 } from './processed/600/test_16x9.jpg';
+export { default as Img800 } from './processed/800/test_16x9.jpg';
+export { default as Img1000 } from './processed/1000/test_16x9.jpg';
+export { default as Img1200 } from './processed/1200/test_16x9.jpg';
