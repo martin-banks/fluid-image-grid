@@ -86,23 +86,21 @@ function calculateRows({ rowHeight, maxHeight, currentRow, margin }) {
 	return ROWS
 }
 
+const overlayTemplate = ({ title, caption, credit }) => `<div class="${Styles.overlay}">
+	${title ? `<h3 class="${Styles.overlay__title}">${MKDOWN(title)}</h3>` : ''}
+	${caption ? `<p class="${Styles.overlay__caption}">${MKDOWN(caption)}</p>` : ''}
+	${credit ? `<p class="${Styles.overlay__credit}">${MKDOWN(credit)}</p>` : ''}
+</div>`
 
-function overlayTemplate({ title, caption, credit }) {
-	return `<div class="${Styles.overlay}">
-		${title ? `<h3 class="${Styles.overlay__title}">${MKDOWN(title)}</h3>` : ''}
-		${caption ? `<p class="${Styles.overlay__caption}">${MKDOWN(caption)}</p>` : ''}
-		${credit ? `<p class="${Styles.overlay__credit}">${MKDOWN(credit)}</p>` : ''}
-	</div>`
-}
+// row and image template
+// needs refactor / tidying
+function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 
-function ImageTemplate({ image }) {
-	return `<div class="${Styles.image__wrapper}" style="background-image: url('${image.ImgthumbBlurLarge}')">
+	const imageTemplate = ({ image }) => `<div class="${Styles.image__wrapper}" style="background-image: url('${image.ImgthumbBlurLarge}')">
 		<img src="${image.Img400}" srcset="${createSrcSet(image)}" alt="" />
 	</div>`
-}
 
-function rowTemplate({ row, newRowHeight, margin }) {
-	return row.map(img => {
+	const rowTemplate = ({ row, newRowHeight, margin }) =>row.map(img => {
 		const { image, credit, caption, title, index } = img
 		return `<div 
 			class="${Styles.image}" 
@@ -114,20 +112,18 @@ function rowTemplate({ row, newRowHeight, margin }) {
 				margin: ${margin / 2}px;
 			"
 		>
-			${ImageTemplate({ image })}
+			${imageTemplate({ image })}
 			${overlayTemplate({ title, caption, credit })}
 		</div>`
 	}).join('')
-}
 
-// row and image template
-// needs refactor / tidying
-function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 	const header = () => `<section class="${Styles.header}">
 		<h2 class="${Styles.header__title}">${content.title}</h2>
 		<p class="${Styles.header__intro}">${content.intro}</p>
 	</section>`
 
+	// create device specific view
+	// these are return when layout is created
 	const desktop = () => calculateRows({ rowHeight, maxHeight, currentRow, margin }).map((row, i) => {
 		const thisRowWidth = STATE.rowWidths[i]
 		const windowWidth = STATE.window.width
@@ -148,7 +144,7 @@ function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 				class="${Styles.image}" 
 				style=""
 			>
-				${image({ image })}
+				${imageTemplate({ image })}
 				<div class="${Styles.overlay}">
 					${title ? `<h3 class="${Styles.overlay__title}">${title}</h3>` : ''}
 					${caption ? `<p class="${Styles.overlay__caption}">${caption}</p>` : ''}
@@ -161,8 +157,6 @@ function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 	return { desktop, mobile, header }
 }
 
-// <img src="${image.Img400}" ${STATE.isLongform ? `srcset="${createSrcSet(image)}"` : ''} alt="" />
-
 
 // now the sizes have been calculated and tempaltes created as strings
 // we are ready to render the app
@@ -171,9 +165,6 @@ function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 // Then render the content to the app container
 // this could be called again on resize but the sizes may also
 // need to be recalculated
-
-// STATE is logged for reference only
-// should be removed for prod publishing
 
 
 function renderApp() {
@@ -243,14 +234,14 @@ function popupNav() {
 		></div>`).join('')}
 	</div>`
 
-	const render = index => [
+	const layout = index => [
 		index > 0 ? prev(index) : '',
 		index < max ? next(index) : '',
 		close,
 		dots(index),
 	].join('')
 
-	return { render }
+	return { layout }
 }
 
 const popupContent = ({ elem, index }) => {
@@ -269,7 +260,7 @@ const popupContent = ({ elem, index }) => {
 			data-type="popImage" 
 		/>
 		${overlayTemplate({ title, caption, credit })}
-		${nav.render(index)}
+		${nav.layout(index)}
 	</div>`
 }
 
