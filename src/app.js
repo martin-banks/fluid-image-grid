@@ -1,3 +1,4 @@
+/* eslint no-console: ['warn', {allow: ['error', 'warn', 'info']}] */
 import config from './config.json'
 import content from './content/index'
 import Styles from './app.sass'
@@ -60,7 +61,7 @@ function calculateRows({ rowHeight, maxHeight, currentRow, margin }) {
 	})
 	const ROWS = indexedcontent.reduce((output, part) => {
 		// console.log(part)
-		let update = output
+		const update = output
 		const lastIndex = Math.max(0, update.length - 1)
 		const lastRow = update[lastIndex]
 		let rowWidth = 0
@@ -94,40 +95,51 @@ function overlayTemplate({ title, caption, credit }) {
 	</div>`
 }
 
+function ImageTemplate({ image }) {
+	return `<div class="${Styles.image__wrapper}" style="background-image: url('${image.ImgthumbBlurLarge}')">
+		<img src="${image.Img400}" srcset="${createSrcSet(image)}" alt="" />
+	</div>`
+}
+
+function rowTemplate({ row, newRowHeight, margin }) {
+	return row.map(img => {
+		const { image, credit, caption, title, index } = img
+		return `<div 
+			class="${Styles.image}" 
+			data-type="image"
+			data-index="${index}"
+			style="
+				height: ${newRowHeight}px; 
+				width: ${newRowHeight / image.ImgData.ratio}px;
+				margin: ${margin / 2}px;
+			"
+		>
+			${ImageTemplate({ image })}
+			${overlayTemplate({ title, caption, credit })}
+		</div>`
+	}).join('')
+}
+
 // row and image template
 // needs refactor / tidying
 function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
+	const header = () => `<section class="${Styles.header}">
+		<h2 class="${Styles.header__title}">${content.title}</h2>
+		<p class="${Styles.header__intro}">${content.intro}</p>
+	</section>`
+
 	const desktop = () => calculateRows({ rowHeight, maxHeight, currentRow, margin }).map((row, i) => {
 		const thisRowWidth = STATE.rowWidths[i]
 		const windowWidth = STATE.window.width
 		const rowHeightAdjustment = Math.min(windowWidth, thisRowWidth) / thisRowWidth
 		const newRowHeight = Math.min((rowHeight * rowHeightAdjustment), maxHeight)
-
-		const rowTemplate = row.map(img => {
-			const { image, credit, caption, title, index } = img
-			return `<div 
-				class="${Styles.image}" 
-				data-type="image"
-				data-index="${index}"
-				style="
-					height: ${newRowHeight}px; 
-					width: ${newRowHeight / image.ImgData.ratio}px;
-					margin: ${margin / 2}px;
-				"
-			>
-				<div class="${Styles.image__wrapper}" style="background-image: url('${image.ImgthumbBlurLarge}')">
-					<img src="${image.Img400}" srcset="${createSrcSet(image)}" alt="" />
-				</div>
-				${overlayTemplate({ title, caption, credit })}
-			</div>`
-		}).join('')
-
-		return `${i === 0 ? `<section class="${Styles.popup}" data-type="popup"></section>` : ''}
-		<section class="${Styles.row}">
-			${rowTemplate}
+		const popup = `<section class="${Styles.popup}" data-type="popup"></section>`
+		const rows = `<section class="${Styles.row}">
+			${rowTemplate({ row, newRowHeight, margin })}
 		</section>`
-	}).join('')
 
+		return [popup, rows].join('')
+	}).join('')
 
 	const mobile = () => content.parts.map(part => {
 		const { image, credit, caption, title } = part
@@ -136,9 +148,7 @@ function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 				class="${Styles.image}" 
 				style=""
 			>
-				<div class="${Styles.image__wrapper}" style="background-image: url('${image.ImgthumbBlurLarge}')">
-					<img src="${image.Img400}" srcset="${createSrcSet(image)}" alt="" />
-				</div>
+				${image({ image })}
 				<div class="${Styles.overlay}">
 					${title ? `<h3 class="${Styles.overlay__title}">${title}</h3>` : ''}
 					${caption ? `<p class="${Styles.overlay__caption}">${caption}</p>` : ''}
@@ -148,7 +158,7 @@ function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 		</section>`
 	}).join('')
 
-	return { desktop, mobile }
+	return { desktop, mobile, header }
 }
 
 // <img src="${image.Img400}" ${STATE.isLongform ? `srcset="${createSrcSet(image)}"` : ''} alt="" />
@@ -173,8 +183,8 @@ function renderApp() {
 	// As the image are scaled down from overset sizes, there is no minimum height
 	// potential risk of extremely wide images becoming too small
 	// refactor to take screen size into consideration
-	const rowHeight = STATE.window.height / 1.3 // 400 // sizes in px
-	const maxHeight = STATE.window.height / 1.1 // 500
+	const rowHeight = STATE.window.height / 2 // 400 // sizes in px
+	const maxHeight = STATE.window.height / 1.5 // 500
 	const margin = 4
 
 	// initial row processing
@@ -186,26 +196,27 @@ function renderApp() {
 
 	// check if template is supported and render appropriate version
 	// render nothing if app (no template) is detected
-	if (longform) {
-		APP.innerHTML = template[STATE.mobile ? 'mobile' : 'desktop']()
-		console.info(`%c### Longform template detected.  \n  ### Custom template is supported  \n  ### Rendering ${STATE.mobile ? 'mobile' : 'desktop'} version`, customLog)
-	} else if (STATE.isStandard) {
-		APP.innerHTML = template.mobile()
-		console.info(`%c### Standard template detected. \n  ### Custom template is supported  \n  ## Rendering ${STATE.mobile ? 'mobile' : 'desktop'} version`, customLog)
-	} else if (isTestEnv()) {
-		APP.innerHTML = template[STATE.mobile ? 'mobile' : 'desktop']()
-		console.info('%c### RENDERING TEST ENV ###', customLog)
-	} else {
-		console.error(' ### Custom template not supported ### ')
+	const grid = () => {
+		if (longform) {
+			console.info(`%c### Longform template detected.  \n  ### Custom template is supported  \n  ### Rendering ${STATE.mobile ? 'mobile' : 'desktop'} version`, customLog)
+			return template[STATE.mobile ? 'mobile' : 'desktop']()
+		} else if (STATE.isStandard) {
+			console.info(`%c### Standard template detected. \n  ### Custom template is supported  \n  ## Rendering ${STATE.mobile ? 'mobile' : 'desktop'} version`, customLog)
+			return template.mobile()
+		} else if (isTestEnv()) {
+			console.info('%c### RENDERING TEST ENV ###', customLog)
+			return template[STATE.mobile ? 'mobile' : 'desktop']()
+		} else {
+			console.error(' ### Custom template not supported ### ')
+			return ''
+		}
 	}
-	// depricated - forcing mobile to load when long-form not detected as app workaround
-	// seems to have memory issue - not in use
-	// } else {
-		// APP.innerHTML = template.mobile()
-		// console.info('%c### Custom template  not fully supported. Rendering mobile version  ### ', customLog)
-	// }
+
+	const layout = [template.header(), grid()].join('')
+	APP.innerHTML = layout
+
 	STATE.popup = document.querySelector('[data-type="popup"')
-	console.log({ STATE })
+	console.info({ STATE })
 }
 
 
