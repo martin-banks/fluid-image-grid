@@ -66,8 +66,8 @@ There are two options for outputing build version for deployment: UAT and PROD. 
 ### What files are output?
 - ```index.html```: entry point to view the app
 - ```embedCode.html```: html embed code that can be included in other sites
-- ```app.js```: the full js SPA
-- ```app.css```:  all teh styles
+- ```app.js```: the full js SPA - only minified in PROD
+- ```app.css```:  all the styles - only minified in PROD
 - ```report.json```: Info about the date/time/user/config setting of the buils
 - ```build.xml```: Only for PROD, this file is used in my deployment server
 - ```src/...```: Directory containing images, icons etc
