@@ -33,7 +33,6 @@ const standardNews = document.querySelector('#page #story')
 const APP = document.querySelector(`#${config.projectName}`)
 const isTestEnv = () => ['localhost', '127.0.0.1'].indexOf(window.location.hostname) !== -1
 
-
 function storeDataInState() {
 	STATE = {
 		window: {
