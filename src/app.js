@@ -65,16 +65,18 @@ function calculateRows({ rowHeight, maxHeight, currentRow, margin }) {
 		const lastRow = update[lastIndex]
 		let rowWidth = 0
 		if (lastRow) {
-			rowWidth = lastRow.reduce((total, img) => (total + (rowHeight / img.image.ImgData.ratio)) + (margin * 2), 0)
+			rowWidth = lastRow.reduce((total, img) => (total + (rowHeight / content.allImages[img.image].ImgData.ratio)) + (margin * 2), 0)
 			if (rowWidth < STATE.window.width) {
 				// console.log('im under!! adding to row', rowWidth)
 				lastRow.push(part)
-				STATE.rowWidths[rowNumber] = (rowWidth + (rowHeight / part.image.ImgData.ratio)) + (margin * 2)
+				const ratio = content.allImages[part.image].ImgData.ratio
+				STATE.rowWidths[rowNumber] = (rowWidth + (rowHeight / ratio)) + (margin * 2)
 			} else {
 				// console.log('im over!! creating new row', rowWidth)
 				// STATE.rowWidths[rowNumber] = rowWidth
 				rowNumber++
-				STATE.rowWidths[rowNumber] = (rowHeight / part.image.ImgData.ratio) + (margin * 2)
+				const ratio = content.allImages[part.image].ImgData.ratio
+				STATE.rowWidths[rowNumber] = (rowHeight / ratio) + (margin * 2)
 				update.push([part])
 			}
 		} else {
@@ -94,24 +96,28 @@ const overlayTemplate = ({ title, caption, credit }) => `<div class="${Styles.ov
 // row and image template
 // needs refactor / tidying
 function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
-
-	const imageTemplate = ({ image }) => `<div class="${Styles.image__wrapper}" style="background-image: url('${image.ImgthumbBlurLarge}')">
+	const imageTemplate = ({ image }) => `<div 
+		class="${Styles.image__wrapper}" 
+		style="background-image: url('${image.ImgthumbBlurLarge}')"
+	>
 		<img src="${image.Img400}" srcset="${createSrcSet(image)}" alt="" />
 	</div>`
 
-	const rowTemplate = ({ row, newRowHeight, margin }) =>row.map(img => {
-		const { image, credit, caption, title, index } = img
+	const rowTemplate = ({ row, newRowHeight, margin }) => row.map(img => {
+		const { credit, caption, title, index } = img
+		const images = content.allImages[img.image]
+		// console.log({ images })
 		return `<div 
 			class="${Styles.image}" 
 			data-type="image"
 			data-index="${index}"
 			style="
 				height: ${newRowHeight}px; 
-				width: ${newRowHeight / image.ImgData.ratio}px;
+				width: ${newRowHeight / images.ImgData.ratio}px;
 				margin: ${margin / 2}px;
 			"
 		>
-			${imageTemplate({ image })}
+			${imageTemplate({ image: images })}
 			${overlayTemplate({ title, caption, credit })}
 		</div>`
 	}).join('')
@@ -137,7 +143,8 @@ function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
 	}).join('')
 
 	const mobile = () => content.parts.map(part => {
-		const { image, credit, caption, title } = part
+		const { credit, caption, title } = part
+		const image = content.allImages[part.image]
 		return `<section class="${Styles.row}">
 			<div 
 				class="${Styles.image}" 
@@ -245,7 +252,8 @@ function popupNav() {
 
 const popupContent = ({ elem, index }) => {
 	const nav = popupNav()
-	const { title, caption, credit, image } = elem
+	const { title, caption, credit } = elem
+	const image = content.allImages[elem.image]
 	return `<div 
 		data-type='fullscreen' 
 		class="${Styles.fullscreen}"
