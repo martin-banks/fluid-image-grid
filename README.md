@@ -36,27 +36,56 @@ There are some settings that need to be updated in the `src/config.json`, this f
 
 ## Adding images
 This app makes use of image srcset, this means it needs a lot of version of the same image so the browser can determine which is the most approriate to load.
-Add you files into the `src/content/images/_RAW` directory, then run `npm run images`. This will call a node app to iterate over all of the images and create the versions that are required. 
+Add you files into the `src/content/images/_RAW` directory, then run `npm run images`. This will call a node app to itterate over all of the images and create the versions that are required. 
 
-To add them to your app, open the `src/content/index.js` file. Import the images at the top of the file and include that reference in the object for that entry, so say you have an `myAwesomeImage.jpg`, you js would look like this:
-
-    import * as myAwesomeImage from './images/myAwesomeImage'
-    const content = {
-      parts: [
-        {
-          "image": myAwesomeImage,
-          "caption": "Caption text including credit if required",
-        },
-      ]
-    }
-    export default content
-
-Add more import more images and add more objects to the `content.parts` array. 
-
-#### What's going on here?
+### What's going on here?
 The node app that processes the images creates multiple versions of the same image, it saves each into a directory named for that size (width). It then writes a reference to that image into a js file including some basic information about the file (original dimensions and orientation)
 
 We can then use JS imports to reference this file in our content object. The supplied Webpack.config.js file is set up to process imported images; creating a new instance of that file along with absolute paths that are passed into the img template.
+
+
+### To add them to your app, 
+#### Automatically
+*_NEW FEATURE_*
+
+Now supporting auto import of all images. All images that have been processed can be auomaticaly added by calling:
+```javascript
+  const allImages = importAllImages(require.context('./path/to/images', false, /\.js/))
+```
+This will import all of the .js files output from the above script (direct import of jpg and png also supported). This creates an object of images, each accessible by it's file name
+
+so for the structure:
+```
+images_folder
+  |_ image_1.jpg
+  |_ image_2.jpg
+  |_ image_3.jpg
+  |_ image_4.jpg
+```
+
+access the first image:
+```javascript
+  allImages.image_1
+```
+
+
+#### Manually
+open the `src/content/index.js` file. Import the images at the top of the file and include that reference in the object for that entry, so say you have an `myAwesomeImage.jpg`, you js would look like this:
+
+```javascript
+  import * as myAwesomeImage from './images/myAwesomeImage'
+  const content = {
+    parts: [
+      {
+        "image": myAwesomeImage,
+        "caption": "Caption text including credit if required",
+      },
+    ]
+  }
+  export default content
+```
+
+
 
 --- 
 
