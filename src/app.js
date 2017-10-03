@@ -65,7 +65,9 @@ function calculateRows({ rowHeight, maxHeight, currentRow, margin }) {
 		const lastRow = update[lastIndex]
 		let rowWidth = 0
 		if (lastRow) {
-			rowWidth = lastRow.reduce((total, img) => (total + (rowHeight / content.allImages[img.image].ImgData.ratio)) + (margin * 2), 0)
+			rowWidth = lastRow.reduce((total, img) => (
+				total + (rowHeight / content.allImages[img.image].ImgData.ratio)) + (margin * 2), 0
+			)
 			if (rowWidth < STATE.window.width) {
 				// console.log('im under!! adding to row', rowWidth)
 				lastRow.push(part)
@@ -93,39 +95,39 @@ const overlayTemplate = ({ title, caption, credit }) => `<div class="${Styles.ov
 	${credit ? `<p class="${Styles.overlay__credit}">${MKDOWN(credit)}</p>` : ''}
 </div>`
 
+const header = () => `<section class="${Styles.header}">
+	<h2 class="${Styles.header__title}">${content.title}</h2>
+	<p class="${Styles.header__intro}">${content.intro}</p>
+</section>`
+const imageTemplate = ({ image }) => `<div 
+	class="${Styles.image__wrapper}" 
+	style="background-image: url('${image.ImgthumbBlurLarge}')"
+>
+	<img src="${image.Img400}" srcset="${createSrcSet(image)}" alt="" />
+</div>`
+
+const rowTemplate = ({ row, newRowHeight, margin }) => row.map(img => {
+	const { credit, caption, title, index } = img
+	const images = content.allImages[img.image]
+	// console.log({ images })
+	return `<div 
+		class="${Styles.image}" 
+		data-type="image"
+		data-index="${index}"
+		style="
+			height: ${newRowHeight}px; 
+			width: ${newRowHeight / images.ImgData.ratio}px;
+			margin: ${margin / 2}px;
+		"
+	>
+		${imageTemplate({ image: images })}
+		${overlayTemplate({ title, caption, credit })}
+	</div>`
+}).join('')
+
 // row and image template
 // needs refactor / tidying
 function fluidGridTemplate({ rowHeight, maxHeight, currentRow, margin }) {
-	const imageTemplate = ({ image }) => `<div 
-		class="${Styles.image__wrapper}" 
-		style="background-image: url('${image.ImgthumbBlurLarge}')"
-	>
-		<img src="${image.Img400}" srcset="${createSrcSet(image)}" alt="" />
-	</div>`
-
-	const rowTemplate = ({ row, newRowHeight, margin }) => row.map(img => {
-		const { credit, caption, title, index } = img
-		const images = content.allImages[img.image]
-		// console.log({ images })
-		return `<div 
-			class="${Styles.image}" 
-			data-type="image"
-			data-index="${index}"
-			style="
-				height: ${newRowHeight}px; 
-				width: ${newRowHeight / images.ImgData.ratio}px;
-				margin: ${margin / 2}px;
-			"
-		>
-			${imageTemplate({ image: images })}
-			${overlayTemplate({ title, caption, credit })}
-		</div>`
-	}).join('')
-
-	const header = () => `<section class="${Styles.header}">
-		<h2 class="${Styles.header__title}">${content.title}</h2>
-		<p class="${Styles.header__intro}">${content.intro}</p>
-	</section>`
 
 	// create device specific view
 	// these are return when layout is created
