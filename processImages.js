@@ -90,39 +90,44 @@ function createAllImages() {
 				manifest.push(manifestTemplate('thumbBlurLarge', 'thumbBlurLarge', file))
 
 				// as each unique version is created, it calls the process for the next ...
-				IM.convert([
-					`${images}/_RAW/${file}`,
-					'-resize', thumbSize,
-					'-quality', thumbQuality,
-					`${images}/processed/thumb/${file}`,
-				],
+				IM.convert(
+					[
+						`${images}/_RAW/${file}`,
+						'-resize', thumbSize,
+						'-quality', thumbQuality,
+						`${images}/processed/thumb/${file}`,
+					],
 					err => {
 						logResult(err, `${file} processed to thumb`)
-						IM.convert([
-							`${images}/_RAW/${file}`,
-							'-resize', thumbSize,
-							'-quality', thumbQuality,
-							'-gaussian-blur', `0x${thumbBlurSmall}`,
-							`${images}/processed/thumbBlurSmall/${file}`,
-						],
-							err => {
-								logResult(err, `${file} processed to thumbBlueSmall`)
-								IM.convert([
-									`${images}/_RAW/${file}`,
-									'-resize', thumbSize,
-									'-quality', thumbQuality,
-									'-gaussian-blur', `0x${thumbBlurLarge}`,
-									`${images}/processed/thumbBlurLarge/${file}`,
-								],
-									err => {
+						IM.convert(
+							[
+								`${images}/_RAW/${file}`,
+								'-resize', thumbSize,
+								'-quality', thumbQuality,
+								'-gaussian-blur', `0x${thumbBlurSmall}`,
+								`${images}/processed/thumbBlurSmall/${file}`,
+							],
+							convertErr => {
+								logResult(convertErr, `${file} processed to thumbBlueSmall`)
+								IM.convert(
+									[
+										`${images}/_RAW/${file}`,
+										'-resize', thumbSize,
+										'-quality', thumbQuality,
+										'-gaussian-blur', `0x${thumbBlurLarge}`,
+										`${images}/processed/thumbBlurLarge/${file}`,
+									],
+									thumbErr => {
 										// ... until it has processed the last,
 										// then it calls the function to process the incremental image versions
-										logResult(err, `${file} processed to thumbBlurLarge`)
+										logResult(thumbErr, `${file} processed to thumbBlurLarge`)
 										createImageIncrement(currentSize, file, manifest)
-									},
+									}
 								)
-							})
-					})
+							}
+						)
+					}
+				)
 			})
 	})
 }
@@ -131,29 +136,31 @@ function createAllImages() {
 // Process the image file into it's incremental versions
 function createImageIncrement(size, file, manifest) {
 	const imagePath = `${images}/_RAW/${file}`
-	console.log({size, sizes})
+	console.log({ size, sizes })
 	if (size === sizes.min) {
 		const fileDimensions = GETSIZE(imagePath)
 		console.log({ fileDimensions })
 		const { width, height } = fileDimensions
 		const ratio = height / width
 		const orientation = width > height ? 'landscape' : 'portrait'
-		manifest.push(`export const ImgData = { width: ${width}, height: ${height}, ratio: ${ratio}, orientation: '${orientation}' }`)
+		const imgData = `export const ImgData = { width: ${width}, height: ${height}, ratio: ${ratio}, orientation: '${orientation}' }`
+		manifest.push(imgData)
 	}
 	manifest.push(manifestTemplate(size, size, file))
 	// const newName = `${file.split('.jpg')[0]}-${size}-done.jpg`
 
 	// Log which image file and size we are starting process for
 	console.log(C.grey(`processing ${file} to ${size}`))
-	IM.convert([
-		imagePath,
-		'-resize', size,
-		'-quality', quality,
-		'-blur', '0x0.05',
-		'-sharpen', '1x1',
-		'-noise', '2',
-		`${images}/processed/${size}/${file}`,
-	],
+	IM.convert(
+		[
+			imagePath,
+			'-resize', size,
+			'-quality', quality,
+			'-blur', '0x0.05',
+			'-sharpen', '1x1',
+			'-noise', '2',
+			`${images}/processed/${size}/${file}`,
+		],
 		IMerror => {
 			logResult(IMerror, `${file} processed ${size}`)
 			const newSize = size + inc
@@ -175,12 +182,13 @@ function createImageIncrement(size, file, manifest) {
 					console.log(C.bgGreen(` All files created for ${file} `).black)
 					// We only want tto process new or changed images so we move this image file into a _done directory 
 					// so it won't be processed again unless required
-					MV(`${images}/_RAW/${file}`,
-						`${images}/_RAW/_DONE/${file}`,
-						moveError => console.log(moveError || ` ${file} moved `.bgYellow.black))
+					MV(`${images}/_RAW/${file}`, `${images}/_RAW/_DONE/${file}`, moveError => {
+						console.log(moveError || ` ${file} moved `.bgYellow.black)
+					})
 				})
 			}
-		})
+		}
+	)
 }
 
 
