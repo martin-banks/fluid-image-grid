@@ -3,6 +3,8 @@ UAT
 .keys
 yarn.lock
 _RAW
+_spike
+processed
 
 # Created by https://www.gitignore.io/api/vim,sublimetext,node,osx,windows,linux,visualstudio,visualstudiocode
 
