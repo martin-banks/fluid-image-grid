@@ -1,0 +1,11 @@
+export { default as Imgthumb } from './processed/thumb/04.jpg';
+export { default as ImgthumbBlurSmall } from './processed/thumbBlurSmall/04.jpg';
+export { default as ImgthumbBlurLarge } from './processed/thumbBlurLarge/04.jpg';
+export const ImgData = { width: 2638, height: 2648, ratio: 1.0037907505686126, orientation: 'portrait' };
+export { default as Img200 } from './processed/200/04.jpg';
+export { default as Img400 } from './processed/400/04.jpg';
+export { default as Img600 } from './processed/600/04.jpg';
+export { default as Img800 } from './processed/800/04.jpg';
+export { default as Img1000 } from './processed/1000/04.jpg';
+export { default as Img1200 } from './processed/1200/04.jpg';
+export { default as Img1400 } from './processed/1400/04.jpg';
