@@ -80,7 +80,7 @@ function createAllImages() {
 			.filter(file => file.indexOf('.jpg') !== -1) // filter any files that are not jpg
 			.forEach(file => {
 				const manifest = []
-				const currentSize = min
+				// const currentSize = min
 
 				// First off we handle the uniquely named/processed files - specifically the thumbnails
 				// As each file is created we push an reference to that file to array
@@ -121,7 +121,7 @@ function createAllImages() {
 										// ... until it has processed the last,
 										// then it calls the function to process the incremental image versions
 										logResult(thumbErr, `${file} processed to thumbBlurLarge`)
-										createImageIncrement(currentSize, file, manifest)
+										createImageIncrement(min, file, manifest)
 									}
 								)
 							}

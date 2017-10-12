@@ -6,8 +6,10 @@ function importAllImages(req) {
 	const images = {}
 	req.keys()
 		.forEach(item => {
-			images[item.replace('./', '')
-				.replace(/\.js|\.jpg|\.png/g, '')] = req(item)
+			const imageName = item
+				.replace('./', '')
+				.replace(/\.js|\.jpg|\.png/g, '')
+			images[imageName] = req(item)
 		})
 	return images
 }

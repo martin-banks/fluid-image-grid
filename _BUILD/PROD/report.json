@@ -1,0 +1,41 @@
+{
+	"ENV": "PROD",
+	"buildBy": "martin-banks",
+	"buildTime": {
+		"date": "20171011",
+		"time": "22-42-58"
+	},
+	"config": {
+		"projectName": "fluid_image_grid",
+		"version": "1.0.0",
+		"section": "network",
+		"path": {
+			"DEV": "localhost:8080/",
+			"UAT": ".",
+			"PROD": "https://s3.something/projectname"
+		},
+		"localstyle": false,
+		"allowClickToFullScreen": true,
+		"autoscroll": {
+			"active": false,
+			"speed": 30
+		},
+		"images": {
+			"children": false,
+			"jsPrefix": "Img",
+			"sizes": {
+				"thumb": 50,
+				"min": 200,
+				"max": 1200,
+				"inc": 200
+			},
+			"quality": {
+				"image": 40,
+				"thumb": 80
+			},
+			"thumbBlurLarge": 2,
+			"thumbBlurSmall": 1,
+			"location": "./src/content/images"
+		}
+	}
+}

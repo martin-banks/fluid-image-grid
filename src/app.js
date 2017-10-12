@@ -1,12 +1,15 @@
 /* eslint no-console: ['warn', {allow: ['error', 'warn', 'info']}] */
+import IML from 'imagesloaded'
 import config from './config.json'
 import content from './content/index'
 import Styles from './app.sass'
 
+
 // utilities
 
 // layout components
-import fluidGridTemplate from './components/fluidGrid'
+import { fluidGridTemplate, imageTemplate } from './components/fluidGrid'
+import overlayTemplate from './components/overlayTemplate'
 import popupNavigation from './components/popupNavigation'
 
 // misc new components
@@ -42,8 +45,8 @@ function fluidGrid({ target } = {}) {
 		// As the image are scaled down from overset sizes, there is no minimum height
 		// potential risk of extremely wide images becoming too small
 		// refactor to take screen size into consideration
-		const rowHeight = window.innerHeight / 2 // 400 // sizes in px
-		const maxHeight = window.innerHeight / 1.5 // 500
+		const rowHeight = window.innerHeight / 2.5 // 400 // sizes in px
+		const maxHeight = window.innerHeight / 2 // 500
 		const margin = 4
 
 		// initial row processing
@@ -76,10 +79,56 @@ function fluidGrid({ target } = {}) {
 		${grid()}
 	</div>`
 
+
+	let rowToRender = 0
+	let rows = []
+
+	const progressiveImageLoad = () => {
+		// Improving the rendering experience
+		// Hi-res images are set to opacity: 0 initially. 
+		const rowImages = rows[rowToRender].querySelectorAll('[data-type="rowimage"]')
+		IML(rowImages, () => {
+			// When all images have laoded in each row have loaded, then set it's opacity to 1 
+			Object.keys(rowImages).forEach(img => rowImages[img].style.opacity = 1)
+
+			// Tim for the next row...
+			rowToRender++
+			// If there isn't another row, then end it here
+			if (rowToRender >= STATE.allRows.length) return
+			// console.log(`Starting row ${rowToRender}`)
+			// If there is another row, get the image/cell containers
+			rows[rowToRender]
+				.querySelectorAll('[data-type="image"]')
+				// Render the image overlay templates for each tile...
+				.forEach(img => {
+					const imgIndex = parseInt(img.getAttribute('data-index'), 10)
+					const imageName = content.parts[imgIndex].image
+					const { title, caption, credit } = content.parts[imgIndex]
+					const image = content.allImages[imageName]
+
+					// All of the overlays have already been loaded, but will be wiped out
+					// so needs to be included in this new render
+					// seemless experience to user
+					img.innerHTML = [
+						imageTemplate({ image }),
+						overlayTemplate({ title, caption, credit }),
+					]
+				})
+			// then call itself again so when this row's images have finished loading 
+			// it will start the next row and so on until all images have loaded
+			progressiveImageLoad()
+		})
+	}
+
 	const render = () => {
 		target.innerHTML = layout()
-		// Satore popup in state for later use
+		// Store popup in state for later use
+
 		STATE.popup = document.querySelector('[data-type="popup"')
+		rows = document.querySelectorAll('[data-type="row"]')
+		rowToRender = 0
+		// Only the first row has images loaded
+		progressiveImageLoad()
 		console.info({ STATE })
 	}
 
