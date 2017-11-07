@@ -21,7 +21,9 @@ import STATE from './state'
 // referenced by other functions in particular the webpack config scripts
 // here we store the selector for the main app container
 const APP = document.querySelector(`#${config.projectName}`)
-const isTestEnv = () => ['localhost', '127.0.0.1'].indexOf(window.location.hostname) !== -1
+// const isTestEnv = () => ['localhost', '127.0.0.1'].indexOf(window.location.hostname) !== -1
+const isTestEnv = () => true
+
 
 
 // now the sizes have been calculated and tempaltes created as strings
@@ -112,7 +114,7 @@ function fluidGrid({ target } = {}) {
 					img.innerHTML = [
 						imageTemplate({ image }),
 						overlayTemplate({ title, caption, credit }),
-					]
+					].join('')
 				})
 			// then call itself again so when this row's images have finished loading 
 			// it will start the next row and so on until all images have loaded
