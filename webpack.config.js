@@ -13,6 +13,8 @@ const username = require('git-user-name');
 // require local files
 const config = require('./src/config.json')
 
+const ENV = process.env.NODE_ENV
+
 // helper functions
 const DD = num => (`0${num}`).slice(-2) // convert number to double digits
 const logEnv = () => {
@@ -27,7 +29,6 @@ const logEnv = () => {
 }
 
 // set up our variables
-const ENV = process.env.NODE_ENV
 // const publicPath = require(`./src/publicPath-${ENV}`)
 const { projectName } = config
 const date = new Date()
@@ -35,12 +36,13 @@ const datestamp = `${date.getFullYear()}${DD(1 + date.getMonth())}${DD(date.getD
 const timestamp = `${DD(date.getHours())}-${DD(date.getMinutes())}-${DD(date.getSeconds())}`
 const buildDir = `./_BUILD/${ENV}`
 const buildPath = path.join(__dirname, buildDir)
-const embedPath = config.path[ENV]
+const embedPath = `${config.path[ENV]}/_BUILD/${ENV}`
 const jsName = ENV === 'PROD' ? 'app.min.js' : 'app.js'
 const cssName = ENV === 'PROD' ? 'app.min.css' : 'app.css'
 const localstyle = config.localstyle ? `\n\t<link rel="stylesheet" href="${buildPath}/${config.localstyle}" />` : ''
 const project = `${(config.path.PROD).split('T3Interactives/')[1]}`
 
+project !== 'undefined' ? '' : console.log(colors.bgRed(` Project location is not defined in ${colors.bgWhite('\ue0b0').red}${colors.bgWhite(' config.json ').black}${colors.bgRed('\ue0b0').white}${colors.bgBlack('\ue0b0').red}`))
 console.log(colors.bgWhite(` ${ENV === 'HOT' ? 'STARTING' : 'BUILDING'} ${logEnv()} ${projectName.black} ${colors.bgBlack('\ue0b0').white}`).black)
 console.log(`${colors.bgWhite(' PATHS   ').black}${colors.bgBlack('\ue0b0').white}\n`, JSON.stringify({ buildPath, buildDir, embedPath }, null, 2), '\n')
 
@@ -91,14 +93,14 @@ if (ENV && ENV !== 'HOT') {
 	// it's callback then writes the report, embed and build files - not derived from any app content
 	MKDIRP(buildDir, err => {
 		if (err) return console.log(colors.bgRed(err))
-		console.log(`\n\n Project directory created successfully ${colors.bgBlack('\ue0b0').white}`.bgWhite.black)
+		console.log(colors.bgWhite.black(`\n\n${colors.bgGreen(' Project directory').black}${colors.bgWhite('\ue0b0').green} created successfully ${colors.bgBlack('\ue0b0').white}`))
 
 		FS.writeFile(`${buildPath}/report.json`, JSON.stringify(report, 'utf8', '\t'), fileErr => {
 			if (fileErr) {
 				console.log(colors.bgRed(fileErr).white)
 				return
 			}
-			console.log(` Report generated successfully ${colors.bgBlack('\ue0b0').white}`.bgWhite.black)
+			console.log(colors.bgWhite.black(`${colors.bgGreen(' report.json').black}${colors.bgWhite('\ue0b0').green} generated successfully ${colors.bgBlack('\ue0b0').white}`))
 		})
 
 		FS.writeFile(`${buildPath}/embedCode.html`, embedCode(), fileErr => {
@@ -106,7 +108,7 @@ if (ENV && ENV !== 'HOT') {
 				console.log(colors.bgRed(fileErr).white)
 				return
 			}
-			console.log(` Embed code generated successfully ${colors.bgBlack('\ue0b0').white}`.bgWhite.black)
+			console.log(colors.bgWhite.black(`${colors.bgGreen(' embedCode.html').black}${colors.bgWhite('\ue0b0').green} generated successfully ${colors.bgBlack('\ue0b0').white}`))
 		})
 
 		if (ENV === 'PROD') {
@@ -115,7 +117,8 @@ if (ENV && ENV !== 'HOT') {
 					console.log(colors.bgRed(fileErr).white)
 					return
 				}
-				console.log(` Build xml generated successfully ${colors.bgBlack('\ue0b0').white}`.bgWhite.black)
+				console.log(colors.bgWhite.black(`${colors.bgGreen(' Build.xml').black}${colors.bgWhite('\ue0b0').green} generated successfully ${colors.bgBlack('\ue0b0').white}`))
+				// console.log(` Build xml generated successfully ${colors.bgBlack('\ue0b0').white}`.bgWhite.black)
 			})
 		}
 	})
@@ -130,7 +133,7 @@ const output = ENV === 'HOT' ? {
 } : {
 	filename: jsName,
 	path: buildPath,
-	publicPath: ENV === 'HOT' ? '' : `${embedPath}/`,
+	publicPath: ENV === 'HOT' ? '' : ENV === 'UAT' ? config.path.uat : `${embedPath}/`,
 }
 
 module.exports = {
@@ -168,7 +171,7 @@ module.exports = {
 								modules: true,
 								// specify our naming convention, this will out put
 								// filename__selectorName__5characterRandomString
-								localIdentName: '[name]__[local]___[hash:base64:5]',
+								localIdentName: `${projectName}__[name]__[local]___[hash:base64:5]`,
 								// only minimize in prod to improve readability while in dev
 								minimize: ENV === 'PROD',
 								importLoaders: 1,
@@ -198,8 +201,8 @@ module.exports = {
 		// all of the entries on this object are accessible to the ejs template
 		new HTMLWebpackPlugin({
 			title: projectName,
-			template: path.join(__dirname, '/src/index.html'),
-			filename: 'index.html',
+			template: path.join(__dirname, '/src/preview.html'),
+			filename: ENV === 'HOT' ? 'index.html' : 'preview.html',
 			localstyle,
 			inject: 'body',
 		}),
