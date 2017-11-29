@@ -47,8 +47,8 @@ function fluidGrid({ target } = {}) {
 		// As the image are scaled down from overset sizes, there is no minimum height
 		// potential risk of extremely wide images becoming too small
 		// refactor to take screen size into consideration
-		const rowHeight = window.innerHeight / 2.5 // 400 // sizes in px
-		const maxHeight = window.innerHeight / 2 // 500
+		const rowHeight = window.innerHeight / 5 // 400 // sizes in px
+		const maxHeight = window.innerHeight / 4 // 500
 		const margin = 4
 
 		// initial row processing
@@ -87,10 +87,10 @@ function fluidGrid({ target } = {}) {
 
 	const progressiveImageLoad = () => {
 		// Improving the rendering experience
-		// Hi-res images are set to opacity: 0 initially. 
+		// Hi-res images are set to opacity: 0 initially.
 		const rowImages = rows[rowToRender].querySelectorAll('[data-type="rowimage"]')
 		IML(rowImages, () => {
-			// When all images have laoded in each row have loaded, then set it's opacity to 1 
+			// When all images have laoded in each row have loaded, then set it's opacity to 1
 			Object.keys(rowImages).forEach(img => rowImages[img].style.opacity = 1)
 
 			// Tim for the next row...
@@ -116,7 +116,7 @@ function fluidGrid({ target } = {}) {
 						overlayTemplate({ title, caption, credit }),
 					].join('')
 				})
-			// then call itself again so when this row's images have finished loading 
+			// then call itself again so when this row's images have finished loading
 			// it will start the next row and so on until all images have loaded
 			progressiveImageLoad()
 		})
